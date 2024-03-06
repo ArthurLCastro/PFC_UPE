@@ -1,11 +1,13 @@
 # Kit de Eletrônica para Maquetes de Arquitetura
 ## Microcontroladores Turma DS - UPE/Poli 2023.2 - Profª Andrea Maria
 
+
 ## **Equipe**:
 
 - Arthur Castro
 - Daíres Macedo
 - Rodrigo Laurênio
+
 
 ## **Introdução**:
 
@@ -17,6 +19,28 @@ Em poucos passos o usuário poderá ter de forma interativa em sua maquete o com
 
 <img src="./documentacao/img/visao_geral.png" alt="Visão Geral" width="500px"/>
 
+
 ## **Links Úteis**:
 
 - [Diagrama de Blocos - Figma](https://www.figma.com/file/gwqnpKY4aKcTteURtjPVdM/Diagrama---Projeto-Kit-de-eletr%C3%B4nica-para-maquetes-de-arquitetura?type=whiteboard&node-id=0%3A1&t=AzJPs2MEIsFIb5rH-1)
+
+
+## **Exemplo de funcionamento da versão atual**:
+
+Ao ligar o Módulo Central (ESP32), um webservice é iniciado, onde o usuário pode informar à central, quais blocos plugou em quais conectores (estes são conectores com identificação simples para o usuário, mas que internamente se conectam a GPIOs do ESP32).
+
+Neste exemplo de uso, dois blocos do tipo "Lâmpada" foram conectados aos conectores 1 e 2 do Módulo Central e dois blocos do tipo "Sensor de luminosidade" foram conectados aos conectores 3 e 4.
+
+Na primeira parte deste exemplo, o usuário configurou o sensor em 3 como controlador da iluminação em 1, e também o sensor em 4 como controlador da iluminação em 2:
+
+![](./documentacao/exemplo_de_funcionamento/ui_config1.png)
+
+![](./documentacao/exemplo_de_funcionamento/hw_config1.jpg)
+
+Na segunda parte deste exemplo, o usuário configurou o sensor em 3 como controlador da iluminação em 2, e também o sensor em 4 como controlador da iluminação em 1:
+
+![](./documentacao/exemplo_de_funcionamento/ui_config2.png)
+
+![](./documentacao/exemplo_de_funcionamento/hw_config2.jpg)
+
+A interface do usuário foi acessada através do navegador no endereço de IP do Módulo Central (porta 80). E as configurações de remapeamento de conectores foram feitas em tempo de execução, sem que o microcontrolador precisasse ser reiniciado.
