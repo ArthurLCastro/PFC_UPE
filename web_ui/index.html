@@ -12,10 +12,10 @@
   <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3"> -->
   <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <style>
-    @media (min-width: 768px) {
-    }
+  <!-- Custom styles for this template -->
+  <link href="./assets/style.css" rel="stylesheet">
 
+  <style>
     .bi {
       vertical-align: -.125em;
       fill: currentColor;
@@ -48,63 +48,104 @@
   </style>
 
 </head>
-<body>
-  <h1>Configurando Módulo Central</h1>
+<body class="d-flex flex-column h-100">
+  <header>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-info">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img src="./assets/img/logo/maquete.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+          <strong>Kit de Eletrônica para Maquetes</strong>
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Página Inicial</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled text-white-50" aria-disabled="true">Sobre o Projeto</a>
+            </li>
+          </ul>
+          <!-- <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form> -->
+        </div>
+      </div>
+    </nav>
+  </header>
+  
+  <!-- Begin page content -->
+  <main class="flex-shrink-0">
+    <div class="container">
+      <h1 class="mt-5">Configurando Módulo Central</h1>
+      <p class="lead">Relacione os blocos utilizados nas automações aos seus conectores</p>
 
-  <form class="row g-3" action="/get">
+      <form class="row g-3" action="/get">
 
-    <h2>Automação 01</h2>
+        <h3 class="mt-4">Automação 01</h3>
+    
+        <div class="col-md-4">
+          <label for="autom01_conLDR" class="form-label">Bloco Sensor de Luminosidade:</label>
+          <select id="autom01_conLDR" class="form-select" name="autom01_conLDR" required>
+            <option value="" selected>Selecione um conector...</option>
+            <option value="C1">Conector 01</option>
+            <option value="C2">Conector 02</option>
+            <option value="C3">Conector 03</option>
+            <option value="C4">Conector 04</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="autom01_conLED" class="form-label">Bloco Lâmpada:</label>
+          <select id="autom01_conLED" class="form-select" name="autom01_conLED" required>
+            <option value="" selected>Selecione um conector...</option>
+            <option value="C1">Conector 01</option>
+            <option value="C2">Conector 02</option>
+            <option value="C3">Conector 03</option>
+            <option value="C4">Conector 04</option>
+          </select>
+        </div>
 
-    <div class="col-md-4">
-      <label for="autom01_conLDR" class="form-label">Bloco Sensor de Luminosidade:</label>
-      <select id="autom01_conLDR" class="form-select" name="autom01_conLDR" required>
-        <option value="" selected>Selecione um conector...</option>
-        <option value="C1">Conector 01</option>
-        <option value="C2">Conector 02</option>
-        <option value="C3">Conector 03</option>
-        <option value="C4">Conector 04</option>
-      </select>
+        <h3 class="mt-4">Automação 02</h3>
+
+        <div class="col-md-4">
+          <label for="autom02_conLDR" class="form-label">Bloco Sensor de Luminosidade:</label>
+          <select id="autom02_conLDR" class="form-select" name="autom02_conLDR" required>
+            <option value="" selected>Selecione um conector...</option>
+            <option value="C1">Conector 01</option>
+            <option value="C2">Conector 02</option>
+            <option value="C3">Conector 03</option>
+            <option value="C4">Conector 04</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="autom02_conLED" class="form-label">Bloco Lâmpada:</label>
+          <select id="autom02_conLED" class="form-select" name="autom02_conLED" required>
+            <option value="" selected>Selecione um conector...</option>
+            <option value="C1">Conector 01</option>
+            <option value="C2">Conector 02</option>
+            <option value="C3">Conector 03</option>
+            <option value="C4">Conector 04</option>
+          </select>
+        </div>
+    
+        <div class="col-12 mt-5">
+          <button type="submit" class="btn btn-primary">Atualizar Módulo Central</button>
+        </div>
+    
+      </form>
     </div>
-    <div class="col-md-4">
-      <label for="autom01_conLED" class="form-label">Bloco Lâmpada:</label>
-      <select id="autom01_conLED" class="form-select" name="autom01_conLED" required>
-        <option value="" selected>Selecione um conector...</option>
-        <option value="C1">Conector 01</option>
-        <option value="C2">Conector 02</option>
-        <option value="C3">Conector 03</option>
-        <option value="C4">Conector 04</option>
-      </select>
+  </main>
+
+  <!-- <footer class="footer mt-auto py-3 bg-body-tertiary">
+    <div class="container">
+      <span class="text-body-secondary">Projeto da Disciplina de Microcontroladores - Poli/UPE 2023.2 Turma DS</span>
     </div>
-
-    <h2>Automação 02</h2>
-
-    <div class="col-md-4">
-      <label for="autom02_conLDR" class="form-label">Bloco Sensor de Luminosidade:</label>
-      <select id="autom02_conLDR" class="form-select" name="autom02_conLDR" required>
-        <option value="" selected>Selecione um conector...</option>
-        <option value="C1">Conector 01</option>
-        <option value="C2">Conector 02</option>
-        <option value="C3">Conector 03</option>
-        <option value="C4">Conector 04</option>
-      </select>
-    </div>
-    <div class="col-md-4">
-      <label for="autom02_conLED" class="form-label">Bloco Lâmpada:</label>
-      <select id="autom02_conLED" class="form-select" name="autom02_conLED" required>
-        <option value="" selected>Selecione um conector...</option>
-        <option value="C1">Conector 01</option>
-        <option value="C2">Conector 02</option>
-        <option value="C3">Conector 03</option>
-        <option value="C4">Conector 04</option>
-      </select>
-    </div>
-
-    <div class="col-12">
-      <button type="submit" class="btn btn-primary">Atualizar Módulo Central</button>
-    </div>
-
-  </form>
-
+  </footer> -->
 
   <!-- Alteracao de tema da pagina -->
   <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
