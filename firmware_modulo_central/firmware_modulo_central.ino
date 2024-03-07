@@ -127,11 +127,18 @@ const char success_html[] PROGMEM = R"rawliteral(
 </html>
 )rawliteral";
 
+/*
 // Relacao entre os conectores do Modulo Central com GPIOs do ESP32 (temporariamente ate escolher todos os pinos como IOs analogicos)
-const uint8_t CONECTOR_01 = 32;     // GPIO Analogico
-const uint8_t CONECTOR_02 = 33;     // GPIO Analogico
-const uint8_t CONECTOR_03 = 34;     // GPI Analogico
-const uint8_t CONECTOR_04 = 35;     // GPI Analogico
+const uint8_t CONECTOR_01 = 32;     // GPIO Analogico do ADC1
+const uint8_t CONECTOR_02 = 33;     // GPIO Analogico do ADC1
+const uint8_t CONECTOR_03 = 34;     // GPI Analogico do ADC1
+const uint8_t CONECTOR_04 = 35;     // GPI Analogico do ADC1
+*/
+// Relacao entre os conectores do Modulo Central com GPIOs do ESP32 (temporariamente ate escolher todos os pinos como IOs analogicos)
+const uint8_t CONECTOR_01 = 25;     // GPIO Analogico do ADC2
+const uint8_t CONECTOR_02 = 26;     // GPIO Analogico do ADC2
+const uint8_t CONECTOR_03 = 27;     // GPIO Analogico do ADC2
+const uint8_t CONECTOR_04 = 14;     // GPIO Analogico do ADC2
 
 String conLdr1="", conLed1="", conLdr2="", conLed2="";
 uint8_t pinLdr1, pinLed1, pinLdr2, pinLed2;
@@ -237,6 +244,27 @@ void setWebserver(){
   server.begin();
 }
 
+void enableWiFi() {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(ssid);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void disableWiFi() {
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+  Serial.println("WiFi Disconnected");
+}
+
 void setup() {
   // Inicializando todos os pinos como entradas por seguranca
   pinMode(CONECTOR_01, INPUT);
@@ -246,20 +274,27 @@ void setup() {
 
   Serial.begin(115200);   // Para fins de DEBUG
 
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("WiFi Failed!");
-    return;
-  }
-  Serial.println();
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.localIP());
-
+  enableWiFi();
   setWebserver();
 }
 
 void loop() {
+  if (Serial.available() > 0) {
+    int rx = Serial.read();
+    Serial.print("rx: ");
+    Serial.println(rx);
+
+    if (rx == 1) {
+      run = false;
+      digitalWrite(pinLed1, LOW);
+      digitalWrite(pinLed2, LOW);
+
+      enableWiFi();
+    } else if (rx == 0) {
+      disableWiFi();
+    }
+  }
+
   if (run) {
     automacao_ldr_run(pinLdr1, pinLed1);
     automacao_ldr_run(pinLdr2, pinLed2);
