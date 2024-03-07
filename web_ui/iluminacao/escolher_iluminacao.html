@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-br" data-bs-theme="auto">
 <head>
-  <script src="./assets/js/color-modes.js"></script>
+  <script src="../assets/js/color-modes.js"></script>
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kit de Eletrônica para Maquetes</title>
-  <link rel="icon" type="image/x-icon" href="./assets/img/logo/maquete.ico">
+  <link rel="icon" type="image/x-icon" href="../assets/img/logo/maquete.ico">
 
   <!-- <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sidebars/"> -->
   <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3"> -->
-  <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Custom styles for this template -->
-  <link href="./assets/style.css" rel="stylesheet">
+  <link href="../assets/style.css" rel="stylesheet">
 
   <style>
     .bi {
@@ -53,8 +53,8 @@
     <!-- Fixed navbar -->
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-info">
       <div class="container-fluid">
-        <a class="navbar-brand" href="./index.html">
-          <img src="./assets/img/logo/maquete.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+        <a class="navbar-brand" href="../index.html">
+          <img src="../assets/img/logo/maquete.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
           <strong>Kit de Eletrônica para Maquetes</strong>
         </a>
         
@@ -64,7 +64,7 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav me-auto mb-2 mb-md-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="./index.html">Página Inicial</a>
+              <a class="nav-link active" aria-current="page" href="../index.html">Página Inicial</a>
             </li>
             <li class="nav-item">
               <a class="nav-link disabled text-white-50" aria-disabled="true">Sobre o Projeto</a>
@@ -83,13 +83,32 @@
   <main class="flex-shrink-0">
     <div class="container">
       <h1 class="mt-5">Configurando Módulo Central</h1>
-      <p class="lead">Selecione o tipo de automação que você deseja configurar</p>
-      
-      <div class="d-grid gap-2 col-6 mx-auto">
-        <a class="btn btn-warning btn-lg" href="./iluminacao/escolher_iluminacao.html" role="button">Automação do Tipo Iluminação</a>
-        <a class="btn btn-danger btn-lg disabled" href="./refrigeracao/escolher_refrigeracao.html" role="button">Automação do Tipo Refrigeração</a>
-        <a class="btn btn-info btn-lg disabled" href="./gas/escolher_gas.html" role="button">Automação do Tipo Gás</a>
-        <a class="btn btn-success btn-lg disabled" href="./irrigacao/escolher_irrigacao.html" role="button">Automação do Tipo Irrigação</a>
+      <p class="lead">Escolha um modelo de <strong>Automação do tipo iluminação</strong></p>
+
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col">
+          <a href="./iluminacao_modelo_01.html" class="btn">
+            <div class="card text-bg-warning">
+              <!-- <img src="#" class="card-img-top" alt="..."> -->
+              <div class="card-body">
+                <h5 class="card-title">Iluminação Modelo 01</h5>
+                <p class="card-text">Um <span class="fst-italic">Bloco Sensor de Luminosidade</span> controlando um <span class="fst-italic">Bloco Lâmpada</span></p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col">
+          <a href="./iluminacao_modelo_02.html" class="btn">
+            <div class="card text-bg-warning">
+              <!-- <img src="#" class="card-img-top" alt="..."> -->
+              <div class="card-body">
+                <h5 class="card-title">Iluminação Modelo 02</h5>
+                <p class="card-text">Um <span class="fst-italic">Bloco Sensor de Presença</span> controlando um <span class="fst-italic">Bloco Lâmpada</span></p>
+              </div>
+            </div>
+          </a>
+        </div>
       </div>
 
     </div>
@@ -152,7 +171,7 @@
     </ul>
   </div>
 
-  <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
