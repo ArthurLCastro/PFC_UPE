@@ -25,49 +25,6 @@ AsyncWebServer server(80);
 const char* ssid = ENV_WIFI_SSID;
 const char* password = ENV_WIFI_PASSWORD;
 
-const char stop_central_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kit para Maquetes</title>
-</head>
-<body>
-    <h1>Configurando Módulo Central</h1>
-    
-    <p>Interrompendo execução do <strong>Módulo Central</strong></p>
-    
-    <a href="/">
-      <button>Voltar</button>
-    </a>
-</body>
-</html>
-)rawliteral";
-
-const char success_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kit de Eletrônica para Maquetes</title>
-</head>
-<body>
-    <h1>Configurando Módulo Central</h1>
-    <p>Informações de conectores enviada para o Módulo Central!</p>
-    <br>
-    <a href="/">
-      <button>Voltar</button>
-    </a>
-    <br>
-    <a href="/stop">
-      <button>Parar execução</button>
-    </a>
-</body>
-</html>
-)rawliteral";
-
 // Relacao entre os conectores do Modulo Central com GPIOs do ESP32 (temporariamente ate escolher todos os pinos como IOs analogicos)
 const uint8_t CONECTOR_01 = 32;     // GPIO Analogico
 const uint8_t CONECTOR_02 = 33;     // GPIO Analogico
@@ -151,7 +108,7 @@ void setWebserver(){
     digitalWrite(pinLed1, LOW);
     digitalWrite(pinLed2, LOW);
 
-    request->send_P(200, "text/html", stop_central_html);
+    request->send(SPIFFS, "/stop_central.html", "text/html");
   });
 
   // Requisicao GET para <ESP_IP>/get passando os parametros necessarios
@@ -179,7 +136,7 @@ void setWebserver(){
     Serial.println(conLed2);
     Serial.println("");
 
-    request->send(200, "text/html", success_html);
+    request->send(SPIFFS, "/success.html", "text/html");
 
     pinLdr1 = converter_conectores_em_pinos(conLdr1);
     pinLed1 = converter_conectores_em_pinos(conLed1);
