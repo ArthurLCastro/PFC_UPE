@@ -13,6 +13,7 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include "SPIFFS.h"
 
 #include "env.h"    // Arquivo externo criado com as definicoes de ENV_WIFI_SSID e ENV_WIFI_PASSWORD
 
@@ -23,66 +24,6 @@ AsyncWebServer server(80);
 
 const char* ssid = ENV_WIFI_SSID;
 const char* password = ENV_WIFI_PASSWORD;
-
-const char index_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kit de Eletrônica para Maquetes</title>
-</head>
-<body>
-    <h1>Configurando Módulo Central</h1>
-
-    <form action="/get">
-        <h2>Automação 01</h2>
-
-        <label for="autom01_conLDR">Conector do LDR:</label>
-        <select name="autom01_conLDR" id="autom01_conLDR" required>
-            <option value="">Selecione um conector...</option>
-            <option value="C1">Conector 01</option>
-            <option value="C2">Conector 02</option>
-            <option value="C3">Conector 03</option>
-            <option value="C4">Conector 04</option>
-        </select>
-        <br>
-        <label for="autom01_conLED">Conector do LED:</label>
-        <select name="autom01_conLED" id="autom01_conLED" required>
-            <option value="">Selecione um conector...</option>
-            <option value="C1">Conector 01</option>
-            <option value="C2">Conector 02</option>
-            <option value="C3">Conector 03</option>
-            <option value="C4">Conector 04</option>
-        </select>
-
-        <h2>Automação 02</h2>
-
-        <label for="autom02_conLDR">Conector do LDR:</label>
-        <select name="autom02_conLDR" id="autom02_conLDR" required>
-            <option value="">Selecione um conector...</option>
-            <option value="C1">Conector 01</option>
-            <option value="C2">Conector 02</option>
-            <option value="C3">Conector 03</option>
-            <option value="C4">Conector 04</option>
-        </select>
-        <br>
-        <label for="autom02_conLED">Conector do LED:</label>
-        <select name="autom02_conLED" id="autom02_conLED" required>
-            <option value="">Selecione um conector...</option>
-            <option value="C1">Conector 01</option>
-            <option value="C2">Conector 02</option>
-            <option value="C3">Conector 03</option>
-            <option value="C4">Conector 04</option>
-        </select>
-        <br>
-        <br>
-        <input type="submit" value="Enviar">
-    </form>
-    
-</body>
-</html>
-)rawliteral";
 
 const char stop_central_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
@@ -172,8 +113,37 @@ void notFound(AsyncWebServerRequest *request) {
 }
 
 void setWebserver(){
+  // Rotas para arquivos
+
+  server.on("/maquete.ico", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/maquete.ico", "image/x-icon");
+  });
+
+  server.on("/maquete.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/maquete.png", "image/png");
+  });
+
+  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/style.css", "text/css");
+  });
+
+  server.on("/bootstrap.min.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/bootstrap.min.css", "text/css");
+  });
+
+  server.on("/color-modes.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/color-modes.js", "text/javascript");
+  });
+
+  server.on("/bootstrap.bundle.min.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/bootstrap.bundle.min.js", "text/javascript");
+  });
+
+
+  // Rotas para paginas do sistema
+
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", index_html);
+    request->send(SPIFFS, "/index.html", "text/html");
   });
 
   server.on("/stop", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -246,14 +216,20 @@ void setup() {
 
   Serial.begin(115200);   // Para fins de DEBUG
 
+  // Inicializa SPIFFS
+  if(!SPIFFS.begin(true)){
+    Serial.println("Ocorreu um erro ao montar o SPIFFS");
+    return;
+  }
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("WiFi Failed!");
+    Serial.println("Falha no Wi-Fi!");
     return;
   }
   Serial.println();
-  Serial.print("IP Address: ");
+  Serial.print("Endereço IP: ");
   Serial.println(WiFi.localIP());
 
   setWebserver();
