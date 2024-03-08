@@ -72,28 +72,28 @@ void notFound(AsyncWebServerRequest *request) {
 void setWebserver(){
   // Rotas para arquivos
 
-  server.on("/maquete.ico", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/maquete.ico", "image/x-icon");
+  server.on("/img/maquete.ico", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/img/maquete.ico", "image/x-icon");
   });
 
-  server.on("/maquete.png", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/maquete.png", "image/png");
+  server.on("/img/maquete.png", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/img/maquete.png", "image/png");
   });
 
-  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/style.css", "text/css");
+  server.on("/css/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/css/style.css", "text/css");
   });
 
-  server.on("/bootstrap.min.css", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/bootstrap.min.css", "text/css");
+  server.on("/css/bootstrap.min.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/css/bootstrap.min.css", "text/css");
   });
 
-  server.on("/color-modes.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/color-modes.js", "text/javascript");
+  server.on("/js/color-modes.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/js/color-modes.js", "text/javascript");
   });
 
-  server.on("/bootstrap.bundle.min.js", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/bootstrap.bundle.min.js", "text/javascript");
+  server.on("/js/bootstrap.bundle.min.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/js/bootstrap.bundle.min.js", "text/javascript");
   });
 
 
@@ -101,6 +101,18 @@ void setWebserver(){
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/index.html", "text/html");
+  });
+
+  server.on("/ilm/escolher", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/ilm/escolher.html", "text/html");
+  });
+
+  server.on("/ilm/mod01", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/ilm/mod01.html", "text/html");
+  });
+
+  server.on("/ilm/mod02", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/ilm/mod02.html", "text/html");
   });
 
   server.on("/stop", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -136,8 +148,6 @@ void setWebserver(){
     Serial.println(conLed2);
     Serial.println("");
 
-    request->send(SPIFFS, "/success.html", "text/html");
-
     pinLdr1 = converter_conectores_em_pinos(conLdr1);
     pinLed1 = converter_conectores_em_pinos(conLed1);
     pinLdr2 = converter_conectores_em_pinos(conLdr2);
@@ -157,6 +167,8 @@ void setWebserver(){
     automacao_ldr_config(pinLdr2, pinLed2);
 
     run = true;
+
+    request->send(SPIFFS, "/success.html", "text/html");
   });
 
   server.onNotFound(notFound);

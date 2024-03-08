@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-br" data-bs-theme="auto">
 <head>
-  <script src="js/color-modes.js"></script>
+  <script src="../js/color-modes.js"></script>
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kit de Eletrônica para Maquetes</title>
-  <link rel="icon" type="image/x-icon" href="img/maquete.ico">
+  <link rel="icon" type="image/x-icon" href="../img/maquete.ico">
 
   <!-- <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sidebars/"> -->
   <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3"> -->
-  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Custom styles for this template -->
-  <link href="css/style.css" rel="stylesheet">
+  <link href="../css/style.css" rel="stylesheet">
 
   <style>
     .bi {
@@ -54,7 +54,7 @@
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-info">
       <div class="container-fluid">
         <a class="navbar-brand" href="/">
-          <img src="img/maquete.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+          <img src="../img/maquete.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
           <strong>Kit de Eletrônica para Maquetes</strong>
         </a>
         
@@ -83,9 +83,46 @@
   <main class="flex-shrink-0">
     <div class="container">
       <h1 class="mt-5">Configurando Módulo Central</h1>
-      <p class="lead">Execução do Módulo Central interrompida</p>
-      <br>
-      <a class="btn btn-primary" href="/" role="button">Voltar</a>
+      <p class="lead">Relacione os blocos utilizados nas automações aos seus conectores</p>
+
+      <form class="row g-3" action="/get">
+
+        <h3 class="mt-4">Automação do Tipo Iluminação - Modelo 02</h3>
+        <p class="mt-0">Um <span class="fst-italic">Bloco Sensor de Presença</span> controlando um <span class="fst-italic">Bloco Lâmpada</span></p>
+
+        <input type="hidden" name="tipo_de_automacao" value="ILM" />
+        <input type="hidden" name="modelo_da_automacao" value="M02" />
+
+        <div class="col-md-4">
+          <label for="conPIR" class="form-label">Bloco Sensor de Presença:</label>
+          <select id="conPIR" class="form-select" name="conPIR" required>
+            <option value="" selected>Selecione um conector...</option>
+            <option value="C1">Conector 01</option>
+            <option value="C2">Conector 02</option>
+            <option value="C3">Conector 03</option>
+            <option value="C4">Conector 04</option>
+            <option value="C5">Conector 05</option>
+            <option value="C6">Conector 06</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="conLED" class="form-label">Bloco Lâmpada:</label>
+          <select id="conLED" class="form-select" name="conLED" required>
+            <option value="" selected>Selecione um conector...</option>
+            <option value="C1">Conector 01</option>
+            <option value="C2">Conector 02</option>
+            <option value="C3">Conector 03</option>
+            <option value="C4">Conector 04</option>
+            <option value="C5">Conector 05</option>
+            <option value="C6">Conector 06</option>
+          </select>
+        </div>
+    
+        <div class="col-12 mt-5">
+          <button type="submit" class="btn btn-primary">Atualizar Módulo Central</button>
+        </div>
+    
+      </form>
     </div>
   </main>
 
@@ -146,7 +183,7 @@
     </ul>
   </div>
 
-  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="../js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
