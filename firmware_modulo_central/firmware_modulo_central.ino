@@ -31,8 +31,8 @@ const uint8_t CONECTOR_02 = 33;     // GPIO Analogico
 const uint8_t CONECTOR_03 = 34;     // GPI Analogico
 const uint8_t CONECTOR_04 = 35;     // GPI Analogico
 
-String conLdr1="", conLed1="", conLdr2="", conLed2="";
-uint8_t pinLdr1, pinLed1, pinLdr2, pinLed2;
+String tipo_de_automacao="", modelo_da_automacao="";
+uint8_t pinLDR, pinLED;
 bool run = false;
 
 void automacao_ldr_config(uint8_t pin_ldr, uint8_t pin_led) {
@@ -117,58 +117,47 @@ void setWebserver(){
 
   server.on("/stop", HTTP_GET, [](AsyncWebServerRequest *request){
     run = false;
-    digitalWrite(pinLed1, LOW);
-    digitalWrite(pinLed2, LOW);
+    digitalWrite(pinLDR, LOW);
+    digitalWrite(pinLED, LOW);
 
     request->send(SPIFFS, "/stop_central.html", "text/html");
   });
 
   // Requisicao GET para <ESP_IP>/get passando os parametros necessarios
   server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    if (request->hasParam("autom01_conLDR")) {
-      conLdr1 = request->getParam("autom01_conLDR")->value();
+    if (request->hasParam("tipo_de_automacao") and request->hasParam("modelo_da_automacao")) {
+      tipo_de_automacao = request->getParam("tipo_de_automacao")->value();
+      modelo_da_automacao = request->getParam("modelo_da_automacao")->value();
+      
+      if (tipo_de_automacao == "ILM" and modelo_da_automacao == "M01") {
+        String conLDR, conLED;
+        // uint8_t pinLDR, pinLED;
+
+        conLDR = request->getParam("conLDR")->value();
+        conLED = request->getParam("conLED")->value();
+
+        Serial.print("conLDR: "); Serial.println(conLDR);
+        Serial.print("conLED: "); Serial.println(conLED);
+
+        pinLDR = converter_conectores_em_pinos(conLDR);
+        pinLED = converter_conectores_em_pinos(conLED);
+
+        Serial.print("pinLDR: "); Serial.println(pinLDR);
+        Serial.print("pinLED: "); Serial.println(pinLED);
+
+        automacao_ldr_config(pinLDR, pinLED);
+        run = true;
+        request->send(SPIFFS, "/success.html", "text/html");
+
+      // } else if (tipo_de_automacao == "ILM" and modelo_da_automacao == "M02") {
+
+      } else {
+        request->send(SPIFFS, "/error.html", "text/html");
+      }
+    
+    } else {
+      request->send(SPIFFS, "/error.html", "text/html");
     }
-    if (request->hasParam("autom01_conLED")) {
-      conLed1 = request->getParam("autom01_conLED")->value();
-    }
-    if (request->hasParam("autom02_conLDR")) {
-      conLdr2 = request->getParam("autom02_conLDR")->value();
-    }
-    if (request->hasParam("autom02_conLED")) {
-      conLed2 = request->getParam("autom02_conLED")->value();
-    }
-
-    Serial.print("conLdr1: ");
-    Serial.println(conLdr1);
-    Serial.print("conLed1: ");
-    Serial.println(conLed1);
-    Serial.print("conLdr2: ");
-    Serial.println(conLdr2);
-    Serial.print("conLed2: ");
-    Serial.println(conLed2);
-    Serial.println("");
-
-    pinLdr1 = converter_conectores_em_pinos(conLdr1);
-    pinLed1 = converter_conectores_em_pinos(conLed1);
-    pinLdr2 = converter_conectores_em_pinos(conLdr2);
-    pinLed2 = converter_conectores_em_pinos(conLed2);
-
-    Serial.print("pinLdr1: ");
-    Serial.println(pinLdr1);
-    Serial.print("pinLed1: ");
-    Serial.println(pinLed1);
-    Serial.print("pinLdr2: ");
-    Serial.println(pinLdr2);
-    Serial.print("pinLed2: ");
-    Serial.println(pinLed2);
-    Serial.println("");
-
-    automacao_ldr_config(pinLdr1, pinLed1);
-    automacao_ldr_config(pinLdr2, pinLed2);
-
-    run = true;
-
-    request->send(SPIFFS, "/success.html", "text/html");
   });
 
   server.onNotFound(notFound);
@@ -191,6 +180,7 @@ void setup() {
     return;
   }
 
+  // Inicializa Wi-Fi
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   if (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -206,8 +196,7 @@ void setup() {
 
 void loop() {
   if (run) {
-    automacao_ldr_run(pinLdr1, pinLed1);
-    automacao_ldr_run(pinLdr2, pinLed2);
+    automacao_ldr_run(pinLDR, pinLED);
   }
   delay(100);       // Provisorio
 }
