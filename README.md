@@ -31,16 +31,22 @@ Ao ligar o Módulo Central (ESP32), um webservice é iniciado, onde o usuário p
 
 Neste exemplo de uso, dois blocos do tipo "Lâmpada" foram conectados aos conectores 1 e 2 do Módulo Central e dois blocos do tipo "Sensor de luminosidade" foram conectados aos conectores 3 e 4.
 
-Na primeira parte deste exemplo, o usuário configurou o sensor em 3 como controlador da iluminação em 1, e também o sensor em 4 como controlador da iluminação em 2:
+### **Exemplo de Montagem 01**:
 
-![](./documentacao/exemplo_de_funcionamento/ui_config1.png)
+Na primeira montagem deste exemplo, o usuário configurou o sensor em 3 como controlador da iluminação em 2:
 
-![](./documentacao/exemplo_de_funcionamento/hw_config1.jpg)
+![](./documentacao/exemplo_de_funcionamento/web_ui_1.png)
 
-Na segunda parte deste exemplo, o usuário configurou o sensor em 3 como controlador da iluminação em 2, e também o sensor em 4 como controlador da iluminação em 1:
+![](./documentacao/exemplo_de_funcionamento/web_ui_2.png)
 
-![](./documentacao/exemplo_de_funcionamento/ui_config2.png)
+![](./documentacao/exemplo_de_funcionamento/web_ui_3.png)
 
-![](./documentacao/exemplo_de_funcionamento/hw_config2.jpg)
+![](./documentacao/exemplo_de_funcionamento/web_ui_4.png)
+
+### **Exemplo de Montagem 02**:
+
+Na segunda montagem deste exemplo, o usuário configurou o sensor em 3 como controlador da iluminação em 1.
+
+### **Conclusão:**
 
 A interface do usuário foi acessada através do navegador no endereço de IP do Módulo Central (porta 80). E as configurações de remapeamento de conectores foram feitas em tempo de execução, sem que o microcontrolador precisasse ser reiniciado.
