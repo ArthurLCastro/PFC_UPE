@@ -25,20 +25,21 @@ AsyncWebServer server(80);
 const char* ssid = ENV_WIFI_SSID;
 const char* password = ENV_WIFI_PASSWORD;
 
-// Relacao entre os conectores do Modulo Central com GPIOs do ESP32 (temporariamente ate escolher todos os pinos como IOs analogicos)
+// Relacao entre os Conectores do Modulo Central com GPIOs do ESP32
+// Pinos para Sensores (Analogicos)
 const uint8_t CONECTOR_01 = 32;     // GPIO Analogico
 const uint8_t CONECTOR_02 = 33;     // GPIO Analogico
 const uint8_t CONECTOR_03 = 34;     // GPI Analogico
 const uint8_t CONECTOR_04 = 35;     // GPI Analogico
+// Pinos para Atuadores (Digitais)
+const uint8_t CONECTOR_05 = 5;      // GPIO Digital
+const uint8_t CONECTOR_06 = 18;     // GPIO Digital
+const uint8_t CONECTOR_07 = 19;     // GPIO Digital
+const uint8_t CONECTOR_08 = 21;     // GPIO Digital
 
 String tipo_de_automacao="", modelo_da_automacao="";
 uint8_t pinLDR, pinLED;
 bool run = false;
-
-void automacao_ldr_config(uint8_t pin_ldr, uint8_t pin_led) {
-  pinMode(pin_ldr, INPUT);
-  pinMode(pin_led, OUTPUT);
-}
 
 void automacao_ldr_run(uint8_t pin_ldr, uint8_t pin_led) {
   uint8_t adc_value = analogRead(pin_ldr);
@@ -59,6 +60,14 @@ uint8_t converter_conectores_em_pinos(String substring) {
     return CONECTOR_03;
   } else if (substring == "C4") {
     return CONECTOR_04;
+  } else if (substring == "C5") {
+    return CONECTOR_05;
+  } else if (substring == "C6") {
+    return CONECTOR_06;
+  } else if (substring == "C7") {
+    return CONECTOR_07;
+  } else if (substring == "C8") {
+    return CONECTOR_08;
   } else {
     Serial.println("Valor de conector inválido! Reinicie o sistema");
     while(1){};
@@ -123,8 +132,8 @@ void setWebserver(){
     request->send(SPIFFS, "/stop_central.html", "text/html");
   });
 
-  // Requisicao GET para <ESP_IP>/get passando os parametros necessarios
-  server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  // Requisicao GET para <ESP_IP>/config passando os parametros necessarios
+  server.on("/config", HTTP_GET, [] (AsyncWebServerRequest *request) {
     if (request->hasParam("tipo_de_automacao") and request->hasParam("modelo_da_automacao")) {
       tipo_de_automacao = request->getParam("tipo_de_automacao")->value();
       modelo_da_automacao = request->getParam("modelo_da_automacao")->value();
@@ -144,8 +153,8 @@ void setWebserver(){
 
         Serial.print("pinLDR: "); Serial.println(pinLDR);
         Serial.print("pinLED: "); Serial.println(pinLED);
+        Serial.println("");
 
-        automacao_ldr_config(pinLDR, pinLED);
         run = true;
         request->send(SPIFFS, "/success.html", "text/html");
 
@@ -166,11 +175,22 @@ void setWebserver(){
 }
 
 void setup() {
-  // Inicializando todos os pinos como entradas por seguranca
+  // Configurando conectores como entradas ou saidas
   pinMode(CONECTOR_01, INPUT);
   pinMode(CONECTOR_02, INPUT);
   pinMode(CONECTOR_03, INPUT);
   pinMode(CONECTOR_04, INPUT);
+
+  pinMode(CONECTOR_05, OUTPUT);
+  pinMode(CONECTOR_06, OUTPUT);
+  pinMode(CONECTOR_07, OUTPUT);
+  pinMode(CONECTOR_08, OUTPUT);
+
+  // Inicializando saidas em nivel logico baixo
+  digitalWrite(CONECTOR_05, LOW);
+  digitalWrite(CONECTOR_06, LOW);
+  digitalWrite(CONECTOR_07, LOW);
+  digitalWrite(CONECTOR_08, LOW);
 
   Serial.begin(115200);   // Para fins de DEBUG
 
