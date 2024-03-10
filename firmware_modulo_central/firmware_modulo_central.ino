@@ -17,8 +17,23 @@
 
 #include "env.h"    // Arquivo externo criado com as definicoes de ENV_WIFI_SSID e ENV_WIFI_PASSWORD
 
-// Descomente as linhas de DEBUG abaixo relacionadas a cada parte do sistema. Atencao: O uso de alguns DEBUGs pode atrasar consideravalmente o codigo
+/*
+  Quando necessario, descomente uma ou mais linhas de DEBUG abaixo...
+  Atencao: O uso de alguns DEBUGs pode atrasar consideravalmente o codigo
+*/
 #define DEBUG_WIFI
+#define DEBUG_AUTOMACOES
+
+#define QTD_MAX_AUTOMACOES 3
+
+struct Automacao {
+  uint8_t input_pin;
+  uint8_t output_pin;
+  void (*function)(uint8_t, uint8_t);
+};
+
+Automacao array_automacoes[QTD_MAX_AUTOMACOES];
+int qtd_automacoes = 0;
 
 AsyncWebServer server(80);
 
@@ -38,7 +53,6 @@ const uint8_t CONECTOR_07 = 19;     // GPIO Digital
 const uint8_t CONECTOR_08 = 21;     // GPIO Digital
 
 String tipo_de_automacao="", modelo_da_automacao="";
-uint8_t pinLDR, pinLED;
 bool run = false;
 
 void automacao_ldr_run(uint8_t pin_ldr, uint8_t pin_led) {
@@ -49,6 +63,35 @@ void automacao_ldr_run(uint8_t pin_ldr, uint8_t pin_led) {
   } else {
     digitalWrite(pin_led, LOW);
   }
+}
+
+void automacao_pir_run(uint8_t pin_pir, uint8_t pin_led) {  
+  digitalWrite(pin_led, digitalRead(pin_pir));
+}
+
+// Função para adicionar automação às configurações. Quando o número de automações ultrapassar o limite, a primeira configurada será sobrescrita
+void config_automacao(uint8_t input_pin, uint8_t output_pin, void (*function)(uint8_t, uint8_t)) {
+  int idx_automacao;
+
+  qtd_automacoes++;
+
+  if (qtd_automacoes <= QTD_MAX_AUTOMACOES) {
+    idx_automacao = qtd_automacoes - 1;
+  } else {
+    qtd_automacoes = QTD_MAX_AUTOMACOES;
+    idx_automacao = 0;
+  }
+
+  array_automacoes[idx_automacao].input_pin = input_pin;
+  array_automacoes[idx_automacao].output_pin = output_pin;
+  array_automacoes[idx_automacao].function = function;
+  
+  #ifdef DEBUG_AUTOMACOES
+  Serial.print("Configurada a automação ");
+  Serial.print(idx_automacao);
+  Serial.print("  |  qtd_automacoes: ");
+  Serial.println(qtd_automacoes);
+  #endif
 }
 
 uint8_t converter_conectores_em_pinos(String substring) {
@@ -126,9 +169,11 @@ void setWebserver(){
 
   server.on("/stop", HTTP_GET, [](AsyncWebServerRequest *request){
     run = false;
-    digitalWrite(pinLDR, LOW);
-    digitalWrite(pinLED, LOW);
-
+  
+    for (int i=0; i < qtd_automacoes; i++) {
+      digitalWrite(array_automacoes[i].output_pin, LOW);
+    }
+    
     request->send(SPIFFS, "/stop_central.html", "text/html");
   });
 
@@ -140,25 +185,31 @@ void setWebserver(){
       
       if (tipo_de_automacao == "ILM" and modelo_da_automacao == "M01") {
         String conLDR, conLED;
-        // uint8_t pinLDR, pinLED;
+        uint8_t pinLDR, pinLED;
 
         conLDR = request->getParam("conLDR")->value();
         conLED = request->getParam("conLED")->value();
 
-        Serial.print("conLDR: "); Serial.println(conLDR);
-        Serial.print("conLED: "); Serial.println(conLED);
-
         pinLDR = converter_conectores_em_pinos(conLDR);
         pinLED = converter_conectores_em_pinos(conLED);
 
-        Serial.print("pinLDR: "); Serial.println(pinLDR);
-        Serial.print("pinLED: "); Serial.println(pinLED);
-        Serial.println("");
-
+        config_automacao(pinLDR, pinLED, automacao_ldr_run);
         run = true;
         request->send(SPIFFS, "/success.html", "text/html");
 
-      // } else if (tipo_de_automacao == "ILM" and modelo_da_automacao == "M02") {
+      } else if (tipo_de_automacao == "ILM" and modelo_da_automacao == "M02") {
+        String conPIR, conLED;
+        uint8_t pinPIR, pinLED;
+
+        conPIR = request->getParam("conPIR")->value();
+        conLED = request->getParam("conLED")->value();
+
+        pinPIR = converter_conectores_em_pinos(conPIR);
+        pinLED = converter_conectores_em_pinos(conLED);
+
+        config_automacao(pinPIR, pinLED, automacao_pir_run);
+        run = true;
+        request->send(SPIFFS, "/success.html", "text/html");
 
       } else {
         request->send(SPIFFS, "/error.html", "text/html");
@@ -207,16 +258,32 @@ void setup() {
     Serial.println("Falha no Wi-Fi!");
     return;
   }
+  #ifdef DEBUG_WIFI
   Serial.println();
   Serial.print("Endereço IP: ");
   Serial.println(WiFi.localIP());
+  #endif
 
   setWebserver();
 }
 
 void loop() {
   if (run) {
-    automacao_ldr_run(pinLDR, pinLED);
+    // Itera sobre a matriz array_automacoes e executa as funções correspondentes para cada uma delas
+    for (int i=0; i < qtd_automacoes; i++) {
+      array_automacoes[i].function(array_automacoes[i].input_pin, array_automacoes[i].output_pin);
+
+      #ifdef DEBUG_AUTOMACOES
+      Serial.print("qtd_automacoes: ");
+      Serial.print(qtd_automacoes);
+      Serial.print("  |  Executando automação ");
+      Serial.print(i);
+      Serial.print("  |  Pinos: ");
+      Serial.print(array_automacoes[i].input_pin);
+      Serial.print(" e ");
+      Serial.println(array_automacoes[i].output_pin);
+      #endif
+    }
   }
   delay(100);       // Provisorio
 }
