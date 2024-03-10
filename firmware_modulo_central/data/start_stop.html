@@ -67,6 +67,9 @@
               <a class="nav-link active" aria-current="page" href="/">Página Inicial</a>
             </li>
             <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/start_stop">Controlar Execução</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link disabled text-white-50" aria-disabled="true">Sobre o Projeto</a>
             </li>
           </ul>
@@ -83,9 +86,14 @@
   <main class="flex-shrink-0">
     <div class="container">
       <h1 class="mt-5">Configurando Módulo Central</h1>
-      <p class="lead">Execução do Módulo Central interrompida</p>
+      <p class="lead">Controlar execução das automações</p>
+
+      <h4>Estado atual: <strong> %RUN_STATE%</strong></h4>
+      <a class="btn btn-success" href="/start">Iniciar execução</a>
+      <a class="btn btn-warning" href="/stop">Interromper execução</a>
       <br>
-      <a class="btn btn-primary" href="/" role="button">Voltar</a>
+      <a class="btn btn-secondary mt-5" href="/" role="button">Voltar</a>
+      <a class="btn btn-danger mt-5" href="/reset" role="button" title="Exclui todas as automações configuradas pelo usuário" onclick="return confirm('Você tem certeza de que deseja excluir todas as automações configuradas?')">Resetar Módulo Central</a>
     </div>
   </main>
 

@@ -22,9 +22,9 @@
   Atencao: O uso de alguns DEBUGs pode atrasar consideravalmente o codigo
 */
 #define DEBUG_WIFI
-#define DEBUG_AUTOMACOES
+// #define DEBUG_AUTOMACOES
 
-#define QTD_MAX_AUTOMACOES 3
+#define QTD_MAX_AUTOMACOES 4
 
 struct Automacao {
   uint8_t input_pin;
@@ -121,6 +121,21 @@ void notFound(AsyncWebServerRequest *request) {
   request->send(404, "text/plain", "Not found");
 }
 
+String processor(const String& var){
+  String run_state;
+  
+  if(var == "RUN_STATE"){
+    if(run){
+      run_state = "Automações em execução";
+    }
+    else{
+      run_state = "Automações suspensas";
+    }
+    return run_state;
+  }
+  return String();
+}
+
 void setWebserver(){
   // Rotas para arquivos
 
@@ -167,14 +182,35 @@ void setWebserver(){
     request->send(SPIFFS, "/ilm/mod02.html", "text/html");
   });
 
+  server.on("/start_stop", HTTP_GET, [](AsyncWebServerRequest *request){    
+    request->send(SPIFFS, "/start_stop.html", String(), false, processor);
+  });
+
+  server.on("/start", HTTP_GET, [](AsyncWebServerRequest *request){
+    run = true;
+    request->send(SPIFFS, "/start_stop.html", String(), false, processor);
+  });
+
   server.on("/stop", HTTP_GET, [](AsyncWebServerRequest *request){
     run = false;
   
     for (int i=0; i < qtd_automacoes; i++) {
       digitalWrite(array_automacoes[i].output_pin, LOW);
     }
-    
-    request->send(SPIFFS, "/stop_central.html", "text/html");
+
+    request->send(SPIFFS, "/start_stop.html", String(), false, processor);
+  });
+
+  server.on("/reset", HTTP_GET, [](AsyncWebServerRequest *request){
+    run = false;
+  
+    for (int i=0; i < qtd_automacoes; i++) {
+      digitalWrite(array_automacoes[i].output_pin, LOW);
+    }
+
+    qtd_automacoes = 0;   // O array 'array_automacoes' ainda esta preenchido, mas sera sobrescrito na proxima configuracao
+
+    request->send(SPIFFS, "/start_stop.html", String(), false, processor);
   });
 
   // Requisicao GET para <ESP_IP>/config passando os parametros necessarios
