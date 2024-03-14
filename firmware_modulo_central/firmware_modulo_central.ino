@@ -42,15 +42,17 @@ const char* password = ENV_WIFI_PASSWORD;
 
 // Relacao entre os Conectores do Modulo Central com GPIOs do ESP32
 // Pinos para Sensores (Analogicos)
-const uint8_t CONECTOR_01 = 32;     // GPIO Analogico
-const uint8_t CONECTOR_02 = 33;     // GPIO Analogico
-const uint8_t CONECTOR_03 = 34;     // GPI Analogico
-const uint8_t CONECTOR_04 = 35;     // GPI Analogico
+const uint8_t CONECTOR_01 = 33;     // GPIO Analogico
+const uint8_t CONECTOR_02 = 32;     // GPIO Analogico
+const uint8_t CONECTOR_03 = 36;     // GPI Analogico
+const uint8_t CONECTOR_04 = 34;     // GPI Analogico
+const uint8_t CONECTOR_05 = 35;     // GPI Analogico
 // Pinos para Atuadores (Digitais)
-const uint8_t CONECTOR_05 = 5;      // GPIO Digital
 const uint8_t CONECTOR_06 = 18;     // GPIO Digital
 const uint8_t CONECTOR_07 = 19;     // GPIO Digital
 const uint8_t CONECTOR_08 = 21;     // GPIO Digital
+const uint8_t CONECTOR_09 = 23;     // GPIO Digital
+const uint8_t CONECTOR_10 = 22;     // GPIO Digital
 
 String tipo_de_automacao="", modelo_da_automacao="";
 bool run = false;
@@ -95,22 +97,26 @@ void config_automacao(uint8_t input_pin, uint8_t output_pin, void (*function)(ui
 }
 
 uint8_t converter_conectores_em_pinos(String substring) {
-  if (substring == "C1") {
+  if (substring == "C01") {
     return CONECTOR_01;
-  } else if (substring == "C2") {
+  } else if (substring == "C02") {
     return CONECTOR_02;
-  } else if (substring == "C3") {
+  } else if (substring == "C03") {
     return CONECTOR_03;
-  } else if (substring == "C4") {
+  } else if (substring == "C04") {
     return CONECTOR_04;
-  } else if (substring == "C5") {
+  } else if (substring == "C05") {
     return CONECTOR_05;
-  } else if (substring == "C6") {
+  } else if (substring == "C06") {
     return CONECTOR_06;
-  } else if (substring == "C7") {
+  } else if (substring == "C07") {
     return CONECTOR_07;
-  } else if (substring == "C8") {
+  } else if (substring == "C08") {
     return CONECTOR_08;
+  } else if (substring == "C09") {
+    return CONECTOR_09;
+  } else if (substring == "C10") {
+    return CONECTOR_10;
   } else {
     Serial.println("Valor de conector inválido! Reinicie o sistema");
     while(1){};
@@ -267,17 +273,20 @@ void setup() {
   pinMode(CONECTOR_02, INPUT);
   pinMode(CONECTOR_03, INPUT);
   pinMode(CONECTOR_04, INPUT);
+  pinMode(CONECTOR_05, INPUT);
 
-  pinMode(CONECTOR_05, OUTPUT);
   pinMode(CONECTOR_06, OUTPUT);
   pinMode(CONECTOR_07, OUTPUT);
   pinMode(CONECTOR_08, OUTPUT);
+  pinMode(CONECTOR_09, OUTPUT);
+  pinMode(CONECTOR_10, OUTPUT);
 
   // Inicializando saidas em nivel logico baixo
-  digitalWrite(CONECTOR_05, LOW);
   digitalWrite(CONECTOR_06, LOW);
   digitalWrite(CONECTOR_07, LOW);
   digitalWrite(CONECTOR_08, LOW);
+  digitalWrite(CONECTOR_09, LOW);
+  digitalWrite(CONECTOR_10, LOW);
 
   Serial.begin(115200);   // Para fins de DEBUG
 
