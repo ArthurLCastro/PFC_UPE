@@ -24,7 +24,7 @@
 #define DEBUG_WIFI
 // #define DEBUG_AUTOMACOES
 
-#define QTD_MAX_AUTOMACOES 4
+#define QTD_MAX_AUTOMACOES 5
 
 struct Automacao {
   uint8_t input_pin;
