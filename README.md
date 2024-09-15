@@ -1,13 +1,6 @@
 # Kit de Eletrônica para Maquetes de Arquitetura
-## Microcontroladores Turma DS - UPE/Poli 2023.2 - Profª Andrea Maria
 
-
-## **Equipe**:
-
-- Arthur Castro
-- Daíres Macedo
-- Rodrigo Laurênio
-
+## Orientadora: Profª Andrea Maria
 
 ## **Introdução**:
 
