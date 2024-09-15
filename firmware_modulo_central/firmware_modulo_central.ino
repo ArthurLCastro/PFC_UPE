@@ -1,12 +1,8 @@
 /*
   Kit de Eletrônica para Maquetes de Arquitetura
-  
-  Projeto 2EE - Microcontroladores - Poli/UPE
-  Turma DS - Prof Andrea Maria
 
   Arthur Castro
-  Daires Macedo
-  Rodrigo Laurenio
+  Orientadora: Profa. Andrea Maria
 */
 
 #include <Arduino.h>
@@ -23,8 +19,12 @@
 */
 #define DEBUG_WIFI
 // #define DEBUG_AUTOMACOES
+// #define DEBUG_REFRIGERACAO
 
-#define QTD_MAX_AUTOMACOES 5
+#define QTD_MAX_AUTOMACOES 4
+
+#define INTERVALO_MS_ENTRE_ATUALIZACOES 1000
+unsigned long previousTime = 0;
 
 struct Automacao {
   uint8_t input_pin;
@@ -34,6 +34,10 @@ struct Automacao {
 
 Automacao array_automacoes[QTD_MAX_AUTOMACOES];
 int qtd_automacoes = 0;
+
+#define ADC_VREF          3300.0
+#define ADC_RESOLUTION    12
+const int ADC_MAX_VALUE = pow(2, ADC_RESOLUTION) - 1;
 
 AsyncWebServer server(80);
 
@@ -57,7 +61,7 @@ const uint8_t CONECTOR_10 = 22;     // GPIO Digital
 String tipo_de_automacao="", modelo_da_automacao="";
 bool run = false;
 
-void automacao_ldr_run(uint8_t pin_ldr, uint8_t pin_led) {
+void automacao_ilm_mod01_run(uint8_t pin_ldr, uint8_t pin_led) {
   uint8_t adc_value = analogRead(pin_ldr);
 
   if (adc_value < 10) {
@@ -67,8 +71,52 @@ void automacao_ldr_run(uint8_t pin_ldr, uint8_t pin_led) {
   }
 }
 
-void automacao_pir_run(uint8_t pin_pir, uint8_t pin_led) {  
+void automacao_ilm_mod02_run(uint8_t pin_pir, uint8_t pin_led) {
   digitalWrite(pin_led, digitalRead(pin_pir));
+}
+
+void automacao_ref_mod01_run(uint8_t pin_sensor, uint8_t pin_atuador) {
+  int qtd_amostras = 0, somatorio = 0, adc_value;
+  float v_out, temp;
+  unsigned long previousTimeRefMod1 = 0;
+
+  while (qtd_amostras < 10) {
+    if (millis() - previousTimeRefMod1 >= 50) {
+      previousTimeRefMod1 = millis();
+
+      somatorio += analogRead(pin_sensor);
+
+      qtd_amostras++;
+
+      #ifdef DEBUG_REFRIGERACAO
+      Serial.print("qtd_amostras: ");
+      Serial.print(qtd_amostras);
+      Serial.print(" | somatorio: ");
+      Serial.println(somatorio);
+      #endif
+    }
+  }
+
+  adc_value = somatorio/qtd_amostras;
+  v_out = adc_value*(ADC_VREF/ADC_MAX_VALUE);
+  temp = v_out/10;
+
+  if (temp >= 25) {
+    digitalWrite(pin_atuador, HIGH);
+  } else {
+    digitalWrite(pin_atuador, LOW);
+  }
+
+  #ifdef DEBUG_REFRIGERACAO
+  Serial.print("adc_value: ");
+  Serial.print(adc_value);
+  Serial.print("  |  v_out: ");
+  Serial.print(v_out);
+  Serial.print("  |  temp: ");
+  Serial.print(temp);
+  Serial.print(" C | Atuador: ");
+  Serial.println(digitalRead(pin_atuador));
+  #endif
 }
 
 // Função para adicionar automação às configurações. Quando o número de automações ultrapassar o limite, a primeira configurada será sobrescrita
@@ -188,6 +236,14 @@ void setWebserver(){
     request->send(SPIFFS, "/ilm/mod02.html", "text/html");
   });
 
+  server.on("/refrigeracao/escolher", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/refrigeracao/escolher.html", "text/html");
+  });
+
+  server.on("/refrigeracao/mod01", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/refrigeracao/mod01.html", "text/html");
+  });
+
   server.on("/start_stop", HTTP_GET, [](AsyncWebServerRequest *request){    
     request->send(SPIFFS, "/start_stop.html", String(), false, processor);
   });
@@ -225,33 +281,51 @@ void setWebserver(){
       tipo_de_automacao = request->getParam("tipo_de_automacao")->value();
       modelo_da_automacao = request->getParam("modelo_da_automacao")->value();
       
-      if (tipo_de_automacao == "ILM" and modelo_da_automacao == "M01") {
-        String conLDR, conLED;
-        uint8_t pinLDR, pinLED;
+      if (tipo_de_automacao == "ILM") {
+        if (modelo_da_automacao == "M01") {
+          String conLDR, conLED;
+          uint8_t pinLDR, pinLED;
 
-        conLDR = request->getParam("conLDR")->value();
-        conLED = request->getParam("conLED")->value();
+          conLDR = request->getParam("conLDR")->value();
+          conLED = request->getParam("conLED")->value();
 
-        pinLDR = converter_conectores_em_pinos(conLDR);
-        pinLED = converter_conectores_em_pinos(conLED);
+          pinLDR = converter_conectores_em_pinos(conLDR);
+          pinLED = converter_conectores_em_pinos(conLED);
 
-        config_automacao(pinLDR, pinLED, automacao_ldr_run);
-        run = true;
-        request->send(SPIFFS, "/success.html", "text/html");
+          config_automacao(pinLDR, pinLED, automacao_ilm_mod01_run);
+          run = true;
+          request->send(SPIFFS, "/success.html", "text/html");
 
-      } else if (tipo_de_automacao == "ILM" and modelo_da_automacao == "M02") {
-        String conPIR, conLED;
-        uint8_t pinPIR, pinLED;
+        } else if (modelo_da_automacao == "M02") {
+          String conPIR, conLED;
+          uint8_t pinPIR, pinLED;
 
-        conPIR = request->getParam("conPIR")->value();
-        conLED = request->getParam("conLED")->value();
+          conPIR = request->getParam("conPIR")->value();
+          conLED = request->getParam("conLED")->value();
 
-        pinPIR = converter_conectores_em_pinos(conPIR);
-        pinLED = converter_conectores_em_pinos(conLED);
+          pinPIR = converter_conectores_em_pinos(conPIR);
+          pinLED = converter_conectores_em_pinos(conLED);
 
-        config_automacao(pinPIR, pinLED, automacao_pir_run);
-        run = true;
-        request->send(SPIFFS, "/success.html", "text/html");
+          config_automacao(pinPIR, pinLED, automacao_ilm_mod02_run);
+          run = true;
+          request->send(SPIFFS, "/success.html", "text/html");
+        }
+
+      } else if (tipo_de_automacao == "REF") {
+        if (modelo_da_automacao == "M01") {
+          String conSensor, conAtuador;
+          uint8_t pinSensor, pinAtuador;
+
+          conSensor = request->getParam("conSensor")->value();
+          conAtuador = request->getParam("conAtuador")->value();
+
+          pinSensor = converter_conectores_em_pinos(conSensor);
+          pinAtuador = converter_conectores_em_pinos(conAtuador);
+
+          config_automacao(pinSensor, pinAtuador, automacao_ref_mod01_run);
+          run = true;
+          request->send(SPIFFS, "/success.html", "text/html");
+        }
 
       } else {
         request->send(SPIFFS, "/error.html", "text/html");
@@ -313,22 +387,30 @@ void setup() {
 }
 
 void loop() {
-  if (run) {
-    // Itera sobre a matriz array_automacoes e executa as funções correspondentes para cada uma delas
-    for (int i=0; i < qtd_automacoes; i++) {
-      array_automacoes[i].function(array_automacoes[i].input_pin, array_automacoes[i].output_pin);
+  if (millis() - previousTime >= INTERVALO_MS_ENTRE_ATUALIZACOES) {
+    previousTime = millis();
 
-      #ifdef DEBUG_AUTOMACOES
-      Serial.print("qtd_automacoes: ");
-      Serial.print(qtd_automacoes);
-      Serial.print("  |  Executando automação ");
-      Serial.print(i);
-      Serial.print("  |  Pinos: ");
-      Serial.print(array_automacoes[i].input_pin);
-      Serial.print(" e ");
-      Serial.println(array_automacoes[i].output_pin);
-      #endif
+    #ifdef DEBUG_AUTOMACOES    
+    Serial.println("Iniciando atualização de todas as automações!");
+    #endif
+
+    if (run) {
+      // Itera sobre a matriz array_automacoes e executa as funções correspondentes para cada uma delas
+      for (int i=0; i < qtd_automacoes; i++) {
+        array_automacoes[i].function(array_automacoes[i].input_pin, array_automacoes[i].output_pin);
+
+        #ifdef DEBUG_AUTOMACOES
+        Serial.print("qtd_automacoes: ");
+        Serial.print(qtd_automacoes);
+        Serial.print("  |  Executando automação ");
+        Serial.print(i);
+        Serial.print("  |  Pinos: ");
+        Serial.print(array_automacoes[i].input_pin);
+        Serial.print(" e ");
+        Serial.println(array_automacoes[i].output_pin);
+        #endif
+      }
     }
+
   }
-  delay(100);       // Provisorio
 }
