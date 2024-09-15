@@ -70,7 +70,7 @@
               <a class="nav-link active" aria-current="page" href="/start_stop">Controlar Execução</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link disabled text-white-50" aria-disabled="true">Sobre o Projeto</a>
+              <a class="nav-link disabAtuador text-white-50" aria-disabAtuador="true">Sobre o Projeto</a>
             </li>
           </ul>
           <!-- <form class="d-flex" role="search">
@@ -86,34 +86,44 @@
   <main class="flex-shrink-0">
     <div class="container">
       <h1 class="mt-5">Configurando Módulo Central</h1>
-      <p class="lead">Escolha um modelo de <strong>Automação do tipo iluminação</strong>:</p>
+      <p class="lead">Relacione os blocos utilizados nas automações aos seus conectores</p>
 
-      <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div class="col">
-          <a href="/ilm/mod01" class="btn">
-            <div class="card text-bg-warning">
-              <!-- <img src="#" class="card-img-top" alt="..."> -->
-              <div class="card-body">
-                <h5 class="card-title">Iluminação Modelo 01</h5>
-                <p class="card-text">Um <span class="fst-italic">Bloco Sensor de Luminosidade</span> controlando um <span class="fst-italic">Bloco Lâmpada</span></p>
-              </div>
-            </div>
-          </a>
+      <form class="row g-3" action="/config">
+
+        <h3 class="mt-4">Automação do Tipo Refrigeração - Modelo 01</h3>
+        <p class="mt-0">Um <span class="fst-italic">Bloco Sensor de Temperatura</span> controlando um <span class="fst-italic">Bloco Ar-condicionado</span></p>
+        <input type="hidden" name="tipo_de_automacao" value="REF" />
+        <input type="hidden" name="modelo_da_automacao" value="M01" />
+
+        <div class="col-md-4">
+          <label for="conSensor" class="form-label">Bloco Sensor de Temperatura:</label>
+          <select id="conSensor" class="form-select" name="conSensor" required>
+            <option value="" selected>Selecione um conector...</option>
+            <option value="C01">Conector 01</option>
+            <option value="C02">Conector 02</option>
+            <option value="C03">Conector 03</option>
+            <option value="C04">Conector 04</option>
+            <option value="C05">Conector 05</option>
+          </select>
         </div>
+        <div class="col-md-4">
+          <label for="conAtuador" class="form-label">Bloco Ar-condicionado:</label>
+          <select id="conAtuador" class="form-select" name="conAtuador" required>
+            <option value="" selected>Selecione um conector...</option>
+            <option value="C06">Conector 06</option>
+            <option value="C07">Conector 07</option>
+            <option value="C08">Conector 08</option>
+            <option value="C09">Conector 09</option>
+            <option value="C10">Conector 10</option>
 
-        <div class="col">
-          <a href="/ilm/mod02" class="btn">
-            <div class="card text-bg-warning">
-              <!-- <img src="#" class="card-img-top" alt="..."> -->
-              <div class="card-body">
-                <h5 class="card-title">Iluminação Modelo 02</h5>
-                <p class="card-text">Um <span class="fst-italic">Bloco Sensor de Presença</span> controlando um <span class="fst-italic">Bloco Lâmpada</span></p>
-              </div>
-            </div>
-          </a>
+          </select>
         </div>
-      </div>
-
+    
+        <div class="col-12 mt-5">
+          <button type="submit" class="btn btn-primary">Atualizar Módulo Central</button>
+        </div>
+    
+      </form>
     </div>
   </main>
 
@@ -149,7 +159,7 @@
       <svg class="bi my-1 theme-icon-active" width="1em" height="1em"><use href="#circle-half"></use></svg>
       <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
     </button>
-    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelAtuadorby="bd-theme-text">
       <li>
         <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
           <svg class="bi me-2 opacity-50" width="1em" height="1em"><use href="#sun-fill"></use></svg>
