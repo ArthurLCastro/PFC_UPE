@@ -1,12 +1,7 @@
 /*
-  Kit de Eletrônica para Maquetes de Arquitetura
-  
-  Projeto 2EE - Microcontroladores - Poli/UPE
-  Turma DS - Prof Andrea Maria
+  Kit Interativo para Ensino de Automacao em Turmas de Arquitetura baseado em Hardware Dinamicamente Reconfiguravel
 
-  Arthur Castro
-  Daires Macedo
-  Rodrigo Laurenio
+  Projeto Final de Curso 2025.1 - Poli/UPE
 */
 
 #include <Arduino.h>
