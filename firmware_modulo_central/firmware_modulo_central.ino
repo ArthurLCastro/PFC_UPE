@@ -8,9 +8,8 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <DNSServer.h>
 #include "SPIFFS.h"
-
-#include "env.h"    // Arquivo externo criado com as definicoes de ENV_WIFI_SSID e ENV_WIFI_PASSWORD
 
 /*
   Quando necessario, descomente uma ou mais linhas de DEBUG abaixo...
@@ -31,9 +30,14 @@ Automacao array_automacoes[QTD_MAX_AUTOMACOES];
 int qtd_automacoes = 0;
 
 AsyncWebServer server(80);
+DNSServer dnsServer;
 
-const char* ssid = ENV_WIFI_SSID;
-const char* password = ENV_WIFI_PASSWORD;
+// Configurações do SoftAP
+const char* ssid_ap = "Kit de Automacao";
+const char* password_ap = NULL;  // Sem senha
+const IPAddress local_ip(192, 168, 4, 1);
+const IPAddress gateway(192, 168, 4, 1);
+const IPAddress subnet(255, 255, 255, 0);
 
 // Relacao entre os Conectores do Modulo Central com GPIOs do ESP32
 // Pinos para Sensores (Analogicos)
@@ -137,7 +141,33 @@ String processor(const String& var){
   return String();
 }
 
+// Redirecionamento do Captive Portal
+void handleCaptivePortal(AsyncWebServerRequest *request) {
+  String url = "http://" + local_ip.toString();
+  request->redirect(url);
+}
+
 void setWebserver(){
+  // Captive Portal - redireciona qualquer domínio para o IP local
+  server.onNotFound([](AsyncWebServerRequest *request){
+    String host = request->host();
+    // Se não for uma requisição para o IP local, redireciona
+    if (host != local_ip.toString()) {
+      handleCaptivePortal(request);
+      return;
+    }
+    // Caso contrário, retorna 404
+    notFound(request);
+  });
+
+
+  // Rotas específicas para detectores de Captive Portal
+  server.on("/generate_204", HTTP_GET, handleCaptivePortal);        // Android
+  server.on("/hotspot-detect.html", HTTP_GET, handleCaptivePortal); // iOS
+  server.on("/connectivity-check.html", HTTP_GET, handleCaptivePortal); // Firefox
+  server.on("/success.txt", HTTP_GET, handleCaptivePortal);         // Windows
+
+
   // Rotas para arquivos
 
   server.on("/img/maquete.ico", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -257,8 +287,6 @@ void setWebserver(){
     }
   });
 
-  server.onNotFound(notFound);
-
   server.begin();
 }
 
@@ -291,23 +319,30 @@ void setup() {
     return;
   }
 
-  // Inicializa Wi-Fi
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("Falha no Wi-Fi!");
-    return;
-  }
+  // Configura o ESP32 como Access Point
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(local_ip, gateway, subnet);
+  WiFi.softAP(ssid_ap, password_ap);
+
   #ifdef DEBUG_WIFI
   Serial.println();
-  Serial.print("Endereço IP: ");
-  Serial.println(WiFi.localIP());
+  Serial.println("Access Point iniciado");
+  Serial.print("SSID: ");
+  Serial.println(ssid_ap);
+  Serial.print("IP: ");
+  Serial.println(WiFi.softAPIP());
   #endif
+
+  // Configura servidor DNS para Captive Portal
+  dnsServer.start(53, "*", local_ip);
 
   setWebserver();
 }
 
 void loop() {
+  // Processa requisições DNS para Captive Portal
+  dnsServer.processNextRequest();
+  
   if (run) {
     // Itera sobre a matriz array_automacoes e executa as funções correspondentes para cada uma delas
     for (int i=0; i < qtd_automacoes; i++) {
