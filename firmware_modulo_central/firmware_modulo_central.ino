@@ -66,7 +66,7 @@ const uint8_t CONECTOR_08 = 21;     // GPIO Digital
 const uint8_t CONECTOR_09 = 23;     // GPIO Digital
 const uint8_t CONECTOR_10 = 22;     // GPIO Digital
 
-String tipo_de_automacao="", modelo_da_automacao="";
+String tipo_de_automacao="", modo_da_automacao="";
 bool run = false;
 
 void automacao_ilm_mod01_run(uint8_t pin_ldr, uint8_t pin_led) {
@@ -354,12 +354,12 @@ void setWebserver(){
 
   // Requisicao GET para <ESP_IP>/config passando os parametros necessarios
   server.on("/config", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    if (request->hasParam("tipo_de_automacao") and request->hasParam("modelo_da_automacao")) {
+    if (request->hasParam("tipo_de_automacao") and request->hasParam("modo_da_automacao")) {
       tipo_de_automacao = request->getParam("tipo_de_automacao")->value();
-      modelo_da_automacao = request->getParam("modelo_da_automacao")->value();
+      modo_da_automacao = request->getParam("modo_da_automacao")->value();
       
       if (tipo_de_automacao == "ILM") {
-        if (modelo_da_automacao == "M01") {
+        if (modo_da_automacao == "M01") {
           String conLDR, conLED;
           uint8_t pinLDR, pinLED;
 
@@ -373,7 +373,7 @@ void setWebserver(){
           run = true;
           request->send(SPIFFS, "/success.html", "text/html");
 
-        } else if (modelo_da_automacao == "M02") {
+        } else if (modo_da_automacao == "M02") {
           String conPIR, conLED;
           uint8_t pinPIR, pinLED;
 
@@ -388,8 +388,8 @@ void setWebserver(){
           request->send(SPIFFS, "/success.html", "text/html");
         }
 
-      } else if (tipo_de_automacao == "REF") {
-        if (modelo_da_automacao == "M01") {
+      } else if (tipo_de_automacao == "HVAC") {
+        if (modo_da_automacao == "M01") {
           String conSensor, conAtuador;
           uint8_t pinSensor, pinAtuador;
 
