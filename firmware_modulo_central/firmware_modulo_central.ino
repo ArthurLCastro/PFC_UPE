@@ -21,7 +21,7 @@
 
 #define QTD_MAX_AUTOMACOES 4
 
-#define INTERVALO_MS_ENTRE_ATUALIZACOES 1000
+#define INTERVALO_MS_ENTRE_ATUALIZACOES 100
 unsigned long previousTime = 0;
 
 struct Automacao {
@@ -41,7 +41,7 @@ AsyncWebServer server(80);
 DNSServer dnsServer;
 
 // Configurações do SoftAP
-const char* ssid_ap = "Kit de Automacao";
+const char* ssid_ap = "Kit de Automacoes";
 const char* password_ap = NULL;  // Sem senha
 const IPAddress local_ip(192, 168, 4, 1);
 const IPAddress gateway(192, 168, 4, 1);
@@ -411,6 +411,7 @@ void setup() {
   Serial.println(ssid_ap);
   Serial.print("IP: ");
   Serial.println(WiFi.softAPIP());
+  Serial.println();
   #endif
 
   // Configura servidor DNS para Captive Portal
@@ -444,6 +445,9 @@ void loop() {
         Serial.print(array_automacoes[i].input_pin);
         Serial.print(" e ");
         Serial.println(array_automacoes[i].output_pin);
+        if (qtd_automacoes == (i+1)) {
+          Serial.println("\n--------------------------------------------------------------------------------\n");
+        }
         #endif
       }
     }
