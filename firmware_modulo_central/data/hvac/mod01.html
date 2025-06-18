@@ -101,11 +101,12 @@
             <option value="" selected>Selecione um conector...</option>
             <option value="C01">Conector 01</option>
             <option value="C02">Conector 02</option>
-            <option value="C03">Conector 03</option>
-            <option value="C04">Conector 04</option>
-            <option value="C05">Conector 05</option>
+            <option value="C03" disabled>Conector 03</option>
+            <option value="C04" disabled>Conector 04</option>
+            <option value="C05" disabled>Conector 05</option>
           </select>
         </div>
+
         <div class="col-md-4">
           <label for="conAtuador" class="form-label">❄️Bloco Ventilador Axial:</label>
           <select id="conAtuador" class="form-select" name="conAtuador" required>
@@ -115,11 +116,15 @@
             <option value="C08">Conector 08</option>
             <option value="C09">Conector 09</option>
             <option value="C10">Conector 10</option>
-
           </select>
         </div>
-    
-        <div class="col-12 mt-5">
+
+        <div class="mb-0 alert alert-primary alert-dismissible fade show" role="alert">
+          <strong>ℹ️ Lembrete!</strong> O Bloco Sensor de Temperatura é compatível apenas com os Conectores 01 e 02
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="col-12 mt-3">
           <button type="submit" class="btn btn-primary">Atualizar Módulo Central</button>
         </div>
     

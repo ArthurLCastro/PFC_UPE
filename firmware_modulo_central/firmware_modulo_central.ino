@@ -10,6 +10,8 @@
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
 #include "SPIFFS.h"
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 /*
   Quando necessario, descomente uma ou mais linhas de DEBUG abaixo...
@@ -17,12 +19,14 @@
 */
 #define DEBUG_WIFI
 // #define DEBUG_AUTOMACOES
-// #define DEBUG_SISTEMA_HVAC
+#define DEBUG_SISTEMA_HVAC
 
-#define QTD_MAX_AUTOMACOES 4
+#define QTD_MAX_AUTOMACOES 5
 
 #define INTERVALO_MS_ENTRE_ATUALIZACOES 100
 unsigned long previousTime = 0;
+
+#define TEMPERATURA_LIMITE 32   // Limiar de temperatura em Celcius para a automacao Sistema HVAC ligar ou desligar o Bloco Ventilador Axial
 
 struct Automacao {
   uint8_t input_pin;
@@ -33,9 +37,9 @@ struct Automacao {
 Automacao array_automacoes[QTD_MAX_AUTOMACOES];
 int qtd_automacoes = 0;
 
-#define ADC_VREF          3300.0
-#define ADC_RESOLUTION    12
-const int ADC_MAX_VALUE = pow(2, ADC_RESOLUTION) - 1;
+// Objetos para o DS18B20 - serão inicializados dinamicamente
+OneWire* oneWire_instances[QTD_MAX_AUTOMACOES] = {nullptr};
+DallasTemperature* sensors_instances[QTD_MAX_AUTOMACOES] = {nullptr};
 
 AsyncWebServer server(80);
 DNSServer dnsServer;
@@ -48,7 +52,8 @@ const IPAddress gateway(192, 168, 4, 1);
 const IPAddress subnet(255, 255, 255, 0);
 
 // Relacao entre os Conectores do Modulo Central com GPIOs do ESP32
-// Pinos para Sensores (Analogicos)
+// Pinos para Sensores (Analogicos/Digitais)
+// Obs.: O Sensor DS18B20 é compatível apenas com os Conectores 01 e 02 por conta do OneWire ser bidirecional
 const uint8_t CONECTOR_01 = 33;     // GPIO Analogico
 const uint8_t CONECTOR_02 = 32;     // GPIO Analogico
 const uint8_t CONECTOR_03 = 36;     // GPI Analogico
@@ -78,47 +83,71 @@ void automacao_ilm_mod02_run(uint8_t pin_pir, uint8_t pin_led) {
   digitalWrite(pin_led, digitalRead(pin_pir));
 }
 
-void automacao_ref_mod01_run(uint8_t pin_sensor, uint8_t pin_atuador) {
-  int qtd_amostras = 0, somatorio = 0, adc_value;
-  float v_out, temp;
-  unsigned long previousTimeRefMod1 = 0;
-
-  while (qtd_amostras < 10) {
-    if (millis() - previousTimeRefMod1 >= 50) {
-      previousTimeRefMod1 = millis();
-
-      somatorio += analogRead(pin_sensor);
-
-      qtd_amostras++;
-
-      #ifdef DEBUG_SISTEMA_HVAC
-      Serial.print("qtd_amostras: ");
-      Serial.print(qtd_amostras);
-      Serial.print(" | somatorio: ");
-      Serial.println(somatorio);
-      #endif
+void automacao_hvac_mod01_run(uint8_t pin_sensor, uint8_t pin_atuador) {
+  // Encontra a instância do sensor correspondente ao pino
+  int sensor_index = -1;
+  for (int i = 0; i < qtd_automacoes; i++) {
+    if (array_automacoes[i].input_pin == pin_sensor && array_automacoes[i].function == automacao_hvac_mod01_run) {
+      sensor_index = i;
+      break;
     }
   }
 
-  adc_value = somatorio/qtd_amostras;
-  v_out = adc_value*(ADC_VREF/ADC_MAX_VALUE);
-  temp = v_out/10;
+  if (sensor_index == -1 || sensors_instances[sensor_index] == nullptr) {
+    #ifdef DEBUG_SISTEMA_HVAC
+    Serial.println("Erro: Sensor DS18B20 não inicializado para este pino");
+    #endif
+    return;
+  }
 
-  if (temp >= 25) {
+  // Solicita leitura de temperatura
+  sensors_instances[sensor_index]->requestTemperatures();
+  
+  // Lê a temperatura em Celsius
+  float temp = sensors_instances[sensor_index]->getTempCByIndex(0);
+  
+  // Verifica se a leitura é válida
+  if (temp == DEVICE_DISCONNECTED_C) {
+    #ifdef DEBUG_SISTEMA_HVAC
+    Serial.println("Erro: DS18B20 desconectado ou falha na leitura");
+    #endif
+    return;
+  }
+
+  // Controle do atuador baseado na temperatura
+  if (temp >= TEMPERATURA_LIMITE) {
     digitalWrite(pin_atuador, HIGH);
   } else {
     digitalWrite(pin_atuador, LOW);
   }
 
   #ifdef DEBUG_SISTEMA_HVAC
-  Serial.print("adc_value: ");
-  Serial.print(adc_value);
-  Serial.print("  |  v_out: ");
-  Serial.print(v_out);
-  Serial.print("  |  temp: ");
+  Serial.print("DS18B20 - Temperatura: ");
   Serial.print(temp);
-  Serial.print(" C | Atuador: ");
-  Serial.println(digitalRead(pin_atuador));
+  Serial.print(" °C | Atuador: ");
+  Serial.println(digitalRead(pin_atuador) ? "Ligado" : "Desligado");
+  #endif
+}
+
+// Função para inicializar uma instância do DS18B20 em um pino específico
+void init_ds18b20_instance(uint8_t pin, int index) {
+  if (oneWire_instances[index] != nullptr) {
+    delete oneWire_instances[index];
+  }
+  if (sensors_instances[index] != nullptr) {
+    delete sensors_instances[index];
+  }
+  
+  oneWire_instances[index] = new OneWire(pin);
+  sensors_instances[index] = new DallasTemperature(oneWire_instances[index]);
+  sensors_instances[index]->begin();
+  
+  #ifdef DEBUG_SISTEMA_HVAC
+  Serial.print("DS18B20 inicializado no pino ");
+  Serial.print(pin);
+  Serial.print(" (índice ");
+  Serial.print(index);
+  Serial.println(")");
   #endif
 }
 
@@ -138,6 +167,11 @@ void config_automacao(uint8_t input_pin, uint8_t output_pin, void (*function)(ui
   array_automacoes[idx_automacao].input_pin = input_pin;
   array_automacoes[idx_automacao].output_pin = output_pin;
   array_automacoes[idx_automacao].function = function;
+  
+  // Se for uma automação HVAC, inicializa o DS18B20
+  if (function == automacao_hvac_mod01_run) {
+    init_ds18b20_instance(input_pin, idx_automacao);
+  }
   
   #ifdef DEBUG_AUTOMACOES
   Serial.print("Configurada a automação ");
@@ -301,6 +335,18 @@ void setWebserver(){
       digitalWrite(array_automacoes[i].output_pin, LOW);
     }
 
+    // Limpa as instâncias dos sensores DS18B20
+    for (int i = 0; i < qtd_automacoes; i++) {
+      if (oneWire_instances[i] != nullptr) {
+        delete oneWire_instances[i];
+        oneWire_instances[i] = nullptr;
+      }
+      if (sensors_instances[i] != nullptr) {
+        delete sensors_instances[i];
+        sensors_instances[i] = nullptr;
+      }
+    }
+
     qtd_automacoes = 0;   // O array 'array_automacoes' ainda esta preenchido, mas sera sobrescrito na proxima configuracao
 
     request->send(SPIFFS, "/start_stop.html", String(), false, processor);
@@ -353,7 +399,7 @@ void setWebserver(){
           pinSensor = converter_conectores_em_pinos(conSensor);
           pinAtuador = converter_conectores_em_pinos(conAtuador);
 
-          config_automacao(pinSensor, pinAtuador, automacao_ref_mod01_run);
+          config_automacao(pinSensor, pinAtuador, automacao_hvac_mod01_run);
           run = true;
           request->send(SPIFFS, "/success.html", "text/html");
         }
