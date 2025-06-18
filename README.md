@@ -1,45 +1,11 @@
-# Kit de Eletrônica para Maquetes de Arquitetura
+# Kit Interativo para Ensino de Automação em Turmas de Arquitetura baseado em Hardware Dinamicamente Reconfigurável
+###  Projeto Final de Curso de Graduação em Engenharia Elétrica Eletrônica pela [Escola Politécnica de Pernambuco (Poli/UPE)](https://poli.br/) em 2025.1.
 
-## Orientadora: Profª Andrea Maria
+>**Observação:** Visando isolar os projetos, mas preservando o histórico de commits, este repositório trata-se de um fork do [projeto](https://github.com/Microcontroladores-UPE-2023-2/Projeto_uC_UPE) que desenvolvi durante a disciplina de Microcontroladores em 2023.2, orientado pela Profª Andrea Maria N. C. Ribeiro.
 
-## **Introdução**:
+## Objetivos:
+O projeto traz como principal objetivo o desenvolvimento de um kit didático, interativo e modular para o ensino dos fundamentos relacionados a sistemas de automação para um público não técnico, especialmente para turmas de graduação e especialização em Arquitetura e Urbanismo. O kit pode ser integrado a maquetes físicas de projetos reais, visando difundir o conhecimento a respeito de tecnologia a partir do seu uso interativo durante aulas práticas.
 
-O projeto consiste no desenvolvimento de conjuntos de blocos “Plug and Play”, com eletrônica embarcada, referentes à domótica de projetos arquitetônicos.
-
-Usuários (mesmo leigos em eletrônica e programação) poderão adicionar os conjuntos de blocos a maquetes de arquitetura e configurar, a partir de uma interface amigável, quais blocos tem relação entre si.
-
-Em poucos passos o usuário poderá ter de forma interativa em sua maquete o comportamento de automações reais, agregando valor ao seu produto.
+Para isso, foi proposta a construção de blocos com sensores e atuadores encapsulados e com conectores padronizados; além de um módulo central de controle, baseado em microcontrolador, com suporte à conexão de múltiplos blocos arbitrariamente escolhidos pelo usuário; a implementação de um firmware com lógicas pré-programadas referentes às automações típicas; o desenvolvimento de uma interface gráfica web amigável, que assegure ao usuário final um alto nível de abstração ao hardware e ao software, sem necessidade de conexão à Internet ou a quaisquer serviços externos. O projeto propõe também assegurar o paralelismo e a independência das automações configuradas pelo usuário final. Além de garantir a entrega de um hardware considerado hot-swappable, ou seja, que permita a substituição de componentes sem precisar desligar ou interromper sua utilização.
 
 <img src="./documentacao/img/visao_geral.png" alt="Visão Geral" width="500px"/>
-
-
-## **Links Úteis**:
-
-- [Diagrama de Blocos - Figma](https://www.figma.com/file/gwqnpKY4aKcTteURtjPVdM/Diagrama---Projeto-Kit-de-eletr%C3%B4nica-para-maquetes-de-arquitetura?type=whiteboard&node-id=0%3A1&t=AzJPs2MEIsFIb5rH-1)
-
-
-<!-- ## **Exemplo de funcionamento da versão atual**:
-
-Ao ligar o Módulo Central (ESP32), um webservice é iniciado, onde o usuário pode informar à central, quais blocos plugou em quais conectores (estes são conectores com identificação simples para o usuário, mas que internamente se conectam a GPIOs do ESP32).
-
-Neste exemplo de uso, dois blocos do tipo "Lâmpada" foram conectados aos conectores 1 e 2 do Módulo Central e dois blocos do tipo "Sensor de luminosidade" foram conectados aos conectores 3 e 4.
-
-### **Exemplo de Montagem 01**:
-
-Na primeira montagem deste exemplo, o usuário configurou o sensor em 3 como controlador da iluminação em 2:
-
-![](./documentacao/exemplo_de_funcionamento/web_ui_1.png)
-
-![](./documentacao/exemplo_de_funcionamento/web_ui_2.png)
-
-![](./documentacao/exemplo_de_funcionamento/web_ui_3.png)
-
-![](./documentacao/exemplo_de_funcionamento/web_ui_4.png)
-
-### **Exemplo de Montagem 02**:
-
-Na segunda montagem deste exemplo, o usuário configurou o sensor em 3 como controlador da iluminação em 1.
-
-### **Conclusão:**
-
-A interface do usuário foi acessada através do navegador no endereço de IP do Módulo Central (porta 80). E as configurações de remapeamento de conectores foram feitas em tempo de execução, sem que o microcontrolador precisasse ser reiniciado. -->

@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-br" data-bs-theme="auto">
 <head>
-  <script src="./assets/js/color-modes.js"></script>
+  <script src="../js/color-modes.js"></script>
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kit de Eletrônica para Maquetes</title>
-  <link rel="icon" type="image/x-icon" href="./assets/img/logo/maquete.ico">
+  <link rel="icon" type="image/x-icon" href="../img/maquete.ico">
 
   <!-- <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sidebars/"> -->
   <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3"> -->
-  <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Custom styles for this template -->
-  <link href="./assets/style.css" rel="stylesheet">
+  <link href="../css/style.css" rel="stylesheet">
 
   <style>
     .bi {
@@ -53,8 +53,8 @@
     <!-- Fixed navbar -->
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-info">
       <div class="container-fluid">
-        <a class="navbar-brand" href="./index.html">
-          <img src="./assets/img/logo/maquete.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+        <a class="navbar-brand" href="/">
+          <img src="../img/maquete.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
           <strong>Kit de Eletrônica para Maquetes</strong>
         </a>
         
@@ -64,10 +64,13 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav me-auto mb-2 mb-md-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="./index.html">Página Inicial</a>
+              <a class="nav-link active" aria-current="page" href="/">Página Inicial</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link disabled text-white-50" aria-disabled="true">Sobre o Projeto</a>
+              <a class="nav-link active" aria-current="page" href="/start_stop">Controlar Execução</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabAtuador text-white-50" aria-disabAtuador="true">Sobre o Projeto</a>
             </li>
           </ul>
           <!-- <form class="d-flex" role="search">
@@ -83,14 +86,44 @@
   <main class="flex-shrink-0">
     <div class="container">
       <h1 class="mt-5">Configurando Módulo Central</h1>
-      <p class="lead">Selecione o tipo de automação que você deseja configurar</p>
-      <div class="d-grid gap-2">
-        <a class="btn btn-warning btn-lg" href="./iluminacao/escolher_iluminacao.html" role="button">Automação do Tipo Iluminação</a>
-        <a class="btn btn-danger btn-lg disabled" href="./refrigeracao/escolher_refrigeracao.html" role="button">Automação do Tipo Refrigeração</a>
-        <a class="btn btn-info btn-lg disabled" href="./gas/escolher_gas.html" role="button">Automação do Tipo Gás</a>
-        <a class="btn btn-success btn-lg disabled" href="./irrigacao/escolher_irrigacao.html" role="button">Automação do Tipo Irrigação</a>
-      </div>
+      <p class="lead">Relacione os blocos utilizados nas automações aos seus conectores</p>
 
+      <form class="row g-3" action="/config">
+
+        <h3 class="mt-4">Automação do Tipo Sistema HVAC - Modelo 01</h3>
+        <p class="mt-0">Um <span class="fst-italic">Bloco Sensor de Temperatura</span> controlando um <span class="fst-italic">Bloco Ventilador Axial</span></p>
+        <input type="hidden" name="tipo_de_automacao" value="REF" />
+        <input type="hidden" name="modelo_da_automacao" value="M01" />
+
+        <div class="col-md-4">
+          <label for="conSensor" class="form-label">🌡️Bloco Sensor de Temperatura:</label>
+          <select id="conSensor" class="form-select" name="conSensor" required>
+            <option value="" selected>Selecione um conector...</option>
+            <option value="C01">Conector 01</option>
+            <option value="C02">Conector 02</option>
+            <option value="C03">Conector 03</option>
+            <option value="C04">Conector 04</option>
+            <option value="C05">Conector 05</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="conAtuador" class="form-label">❄️Bloco Ventilador Axial:</label>
+          <select id="conAtuador" class="form-select" name="conAtuador" required>
+            <option value="" selected>Selecione um conector...</option>
+            <option value="C06">Conector 06</option>
+            <option value="C07">Conector 07</option>
+            <option value="C08">Conector 08</option>
+            <option value="C09">Conector 09</option>
+            <option value="C10">Conector 10</option>
+
+          </select>
+        </div>
+    
+        <div class="col-12 mt-5">
+          <button type="submit" class="btn btn-primary">Atualizar Módulo Central</button>
+        </div>
+    
+      </form>
     </div>
   </main>
 
@@ -126,7 +159,7 @@
       <svg class="bi my-1 theme-icon-active" width="1em" height="1em"><use href="#circle-half"></use></svg>
       <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
     </button>
-    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelAtuadorby="bd-theme-text">
       <li>
         <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
           <svg class="bi me-2 opacity-50" width="1em" height="1em"><use href="#sun-fill"></use></svg>
@@ -151,7 +184,7 @@
     </ul>
   </div>
 
-  <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

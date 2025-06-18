@@ -1,17 +1,15 @@
 /*
-  Kit de Eletrônica para Maquetes de Arquitetura
+  Kit Interativo para Ensino de Automacao em Turmas de Arquitetura baseado em Hardware Dinamicamente Reconfiguravel
 
-  Arthur Castro
-  Orientadora: Profa. Andrea Maria
+  Projeto Final de Curso 2025.1 - Poli/UPE
 */
 
 #include <Arduino.h>
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <DNSServer.h>
 #include "SPIFFS.h"
-
-#include "env.h"    // Arquivo externo criado com as definicoes de ENV_WIFI_SSID e ENV_WIFI_PASSWORD
 
 /*
   Quando necessario, descomente uma ou mais linhas de DEBUG abaixo...
@@ -19,7 +17,7 @@
 */
 #define DEBUG_WIFI
 // #define DEBUG_AUTOMACOES
-// #define DEBUG_REFRIGERACAO
+// #define DEBUG_SISTEMA_HVAC
 
 #define QTD_MAX_AUTOMACOES 4
 
@@ -40,9 +38,14 @@ int qtd_automacoes = 0;
 const int ADC_MAX_VALUE = pow(2, ADC_RESOLUTION) - 1;
 
 AsyncWebServer server(80);
+DNSServer dnsServer;
 
-const char* ssid = ENV_WIFI_SSID;
-const char* password = ENV_WIFI_PASSWORD;
+// Configurações do SoftAP
+const char* ssid_ap = "Kit de Automacao";
+const char* password_ap = NULL;  // Sem senha
+const IPAddress local_ip(192, 168, 4, 1);
+const IPAddress gateway(192, 168, 4, 1);
+const IPAddress subnet(255, 255, 255, 0);
 
 // Relacao entre os Conectores do Modulo Central com GPIOs do ESP32
 // Pinos para Sensores (Analogicos)
@@ -88,7 +91,7 @@ void automacao_ref_mod01_run(uint8_t pin_sensor, uint8_t pin_atuador) {
 
       qtd_amostras++;
 
-      #ifdef DEBUG_REFRIGERACAO
+      #ifdef DEBUG_SISTEMA_HVAC
       Serial.print("qtd_amostras: ");
       Serial.print(qtd_amostras);
       Serial.print(" | somatorio: ");
@@ -107,7 +110,7 @@ void automacao_ref_mod01_run(uint8_t pin_sensor, uint8_t pin_atuador) {
     digitalWrite(pin_atuador, LOW);
   }
 
-  #ifdef DEBUG_REFRIGERACAO
+  #ifdef DEBUG_SISTEMA_HVAC
   Serial.print("adc_value: ");
   Serial.print(adc_value);
   Serial.print("  |  v_out: ");
@@ -190,7 +193,35 @@ String processor(const String& var){
   return String();
 }
 
+// Redirecionamento do Captive Portal
+void handleCaptivePortal(AsyncWebServerRequest *request) {
+  String url = "http://" + local_ip.toString();
+  request->redirect(url);
+}
+
 void setWebserver(){
+  // Captive Portal - Redireciona qualquer domínio para o IP local
+
+  server.onNotFound([](AsyncWebServerRequest *request){
+    String host = request->host();
+    // Se não for uma requisição para o IP local, redireciona
+    if (host != local_ip.toString()) {
+      handleCaptivePortal(request);
+      return;
+    }
+    // Caso contrário, retorna 404
+    notFound(request);
+  });
+
+
+  // Rotas específicas para detectores de Captive Portal
+
+  server.on("/generate_204", HTTP_GET, handleCaptivePortal);              // Android
+  server.on("/hotspot-detect.html", HTTP_GET, handleCaptivePortal);       // iOS
+  server.on("/connectivity-check.html", HTTP_GET, handleCaptivePortal);   // Firefox
+  server.on("/success.txt", HTTP_GET, handleCaptivePortal);               // Windows
+
+
   // Rotas para arquivos
 
   server.on("/img/maquete.ico", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -236,12 +267,12 @@ void setWebserver(){
     request->send(SPIFFS, "/ilm/mod02.html", "text/html");
   });
 
-  server.on("/refrigeracao/escolher", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/refrigeracao/escolher.html", "text/html");
+  server.on("/hvac/escolher", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/hvac/escolher.html", "text/html");
   });
 
-  server.on("/refrigeracao/mod01", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/refrigeracao/mod01.html", "text/html");
+  server.on("/hvac/mod01", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/hvac/mod01.html", "text/html");
   });
 
   server.on("/start_stop", HTTP_GET, [](AsyncWebServerRequest *request){    
@@ -336,8 +367,6 @@ void setWebserver(){
     }
   });
 
-  server.onNotFound(notFound);
-
   server.begin();
 }
 
@@ -370,25 +399,32 @@ void setup() {
     return;
   }
 
-  // Inicializa Wi-Fi
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  if (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("Falha no Wi-Fi!");
-    return;
-  }
+  // Configura o ESP32 como Access Point
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(local_ip, gateway, subnet);
+  WiFi.softAP(ssid_ap, password_ap);
+
   #ifdef DEBUG_WIFI
   Serial.println();
-  Serial.print("Endereço IP: ");
-  Serial.println(WiFi.localIP());
+  Serial.println("Access Point iniciado");
+  Serial.print("SSID: ");
+  Serial.println(ssid_ap);
+  Serial.print("IP: ");
+  Serial.println(WiFi.softAPIP());
   #endif
+
+  // Configura servidor DNS para Captive Portal
+  dnsServer.start(53, "*", local_ip);
 
   setWebserver();
 }
 
-void loop() {
+void loop() { 
   if (millis() - previousTime >= INTERVALO_MS_ENTRE_ATUALIZACOES) {
     previousTime = millis();
+
+    // Processa requisições DNS para Captive Portal
+    dnsServer.processNextRequest();
 
     #ifdef DEBUG_AUTOMACOES    
     Serial.println("Iniciando atualização de todas as automações!");
