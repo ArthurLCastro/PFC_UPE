@@ -15,12 +15,13 @@ The growth of the home and building automation market has driven the demand for 
 <img src="documentacao\img\Web GUI\Web GUI.png" alt="Visão Geral" width="450px"/>
 
 ## Links Úteis:
+- [Texto Monográfico Completo](https://drive.google.com/drive/folders/1Vp7jWpa_wb8d3-5_pR3qDvsxuBsfatM2?usp=sharing)
+- [Apresentação de Slides - Defesa](https://drive.google.com/drive/folders/1Y9DD6ZYsuO3L4jx2YZfhMqfp-T-L15gw?usp=sharing)
 - [Vídeo Demonstrativo do Projeto em Funcionamento - YouTube](https://youtu.be/_Y_bTkdbix0)
-- [Tabela de Custos do Projeto + BDI](https://docs.google.com/spreadsheets/d/e/2PACX-1vT7zG8s57LzWiqkcHG2m7nFv2OfG8MMRvZamC5CtMIS_zD_RT2X_nVPTGp8xNnkmQ/pubhtml?gid=1743629111&single=true)
-- [Repositório do Projeto - GitHub](https://github.com/ArthurLCastro/PFC_UPE/)
-- [Texto Monográfico Completo]()
-- [Fotos](./documentacao/img/Fotos/)
-- [Firmware](./firmware_modulo_central/firmware_modulo_central.ino) e [Fluxograma do Firmware](./documentacao/img/Fluxogramas/Fluxograma%20do%20Firmware.png)
-- [Arquivos - Web GUI](./firmware_modulo_central/data/)
+- [Tabela de Custos + BDI](https://docs.google.com/spreadsheets/d/e/2PACX-1vT7zG8s57LzWiqkcHG2m7nFv2OfG8MMRvZamC5CtMIS_zD_RT2X_nVPTGp8xNnkmQ/pubhtml?gid=1743629111&single=true)
+- [Repositório do Projeto - GitHub](https://github.com/ArthurLCastro/PFC_UPE/):
+    - [Firmware](./firmware_modulo_central/firmware_modulo_central.ino) e [Fluxograma do Firmware](./documentacao/img/Fluxogramas/Fluxograma%20do%20Firmware.png)
+    - [Arquivos - Web GUI](./firmware_modulo_central/data/)
+    - [Fotos](./documentacao/img/Fotos/)
 
 >**Nota:** Visando separar os projetos, mas preservando o histórico de commits, este repositório trata-se de um fork do [projeto](https://github.com/Microcontroladores-UPE-2023-2/Projeto_uC_UPE) que desenvolvi durante a disciplina de Microcontroladores em 2023.2, orientado pela Profª Andrea Maria N. C. Ribeiro.
