@@ -18,6 +18,7 @@ The growth of the home and building automation market has driven the demand for 
 
 ## Links Úteis:
 - [Vídeo Demonstrativo do Projeto em Funcionamento - YouTube](https://youtu.be/_Y_bTkdbix0)
+- [Tabela de Custos do Projeto + BDI](https://docs.google.com/spreadsheets/d/e/2PACX-1vT7zG8s57LzWiqkcHG2m7nFv2OfG8MMRvZamC5CtMIS_zD_RT2X_nVPTGp8xNnkmQ/pubhtml?gid=1743629111&single=true)
 - [Repositório do Projeto - GitHub](https://github.com/ArthurLCastro/PFC_UPE/)
 - [Texto Monográfico Completo]()
 - [Fotos](./documentacao/img/Fotos/)
