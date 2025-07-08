@@ -1,8 +1,6 @@
 # Kit Interativo para Ensino de Automação em Turmas de Arquitetura baseado em Hardware Dinamicamente Reconfigurável
 ###  Projeto Final de Curso de Graduação em Engenharia Elétrica Eletrônica pela [Escola Politécnica de Pernambuco (Poli/UPE)](https://poli.br/) em 2025.1.
 
->**Observação:** Visando isolar os projetos, mas preservando o histórico de commits, este repositório trata-se de um fork do [projeto](https://github.com/Microcontroladores-UPE-2023-2/Projeto_uC_UPE) que desenvolvi durante a disciplina de Microcontroladores em 2023.2, orientado pela Profª Andrea Maria N. C. Ribeiro.
-
 ## Resumo:
 O crescimento do mercado de automação residencial e predial tem impulsionado a demanda por profissionais capacitados para projetar e implementar sistemas inteligentes em edificações. Apesar desse cenário, cursos de Arquitetura e Urbanismo ainda apresentam pouca abordagem prática sobre os fundamentos técnicos de automação. Este trabalho apresenta um kit didático como ferramenta educacional, com o objetivo de ensinar conceitos de automação para um público não técnico, podendo ser integrado a maquetes físicas de projetos reais dos estudantes. O hardware proposto, baseado em microcontrolador, sensores e atuadores, orquestra diferentes tipos de automação configuradas em tempo de execução a partir de uma interface web em LAN. Oferecendo uma alta abstração aos usuários, o sistema é capaz de executar até cinco automações escolhidas dentre quatro diferentes tipos disponíveis, de forma paralela e independente. O projeto apresenta uma solução modular e de utilização direta, contribuindo para a formação de profissionais mais familiarizados com as tecnologias contemporâneas.
 
@@ -24,3 +22,5 @@ The growth of the home and building automation market has driven the demand for 
 - [Fotos](./documentacao/img/Fotos/)
 - [Firmware](./firmware_modulo_central/firmware_modulo_central.ino) e [Fluxograma do Firmware](./documentacao/img/Fluxogramas/Fluxograma%20do%20Firmware.png)
 - [Arquivos - Web GUI](./firmware_modulo_central/data/)
+
+>**Nota:** Visando separar os projetos, mas preservando o histórico de commits, este repositório trata-se de um fork do [projeto](https://github.com/Microcontroladores-UPE-2023-2/Projeto_uC_UPE) que desenvolvi durante a disciplina de Microcontroladores em 2023.2, orientado pela Profª Andrea Maria N. C. Ribeiro.
